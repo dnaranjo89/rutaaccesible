@@ -11,7 +11,7 @@
     {# the following API key is only for development #}
     <script src="https://maps.googleapis.com/maps/api/js?v=3&libraries=places&sensor=false&key=AIzaSyB9vvH3_yypmEd4HCxvd2OtIbBk7PgbuOE"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.0.0/leaflet-routing-machine.min.js"></script>
+    <script src="{{ url_for('static', filename='assets/leaflet-routing-machine/leaflet-routing-machine.js') }}"></script>
     <script src="{{ url_for('static', filename='assets/lrm-mapzen/lrm-mapzen.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/lrm-mapzen/leaflet.routing.mapzen.css') }}">
 
@@ -38,7 +38,7 @@
         <img id="current-loc-icon" src="{{ url_for('static', filename='images/current_loc.png') }}">
 
         <div id="route-box" class="col-xs-12">
-            <input id="route-from" type="text" class="form-control" placeholder="Desde..." value="Calle Carvajal Lancaster, 14" data-lat="39.4742269" data-lng="-6.377560899999935">
+            <input id="route-from" type="text" class="form-control" placeholder="Desde..." value="Calle Trajano, Cáceres‎, Cáceres" data-lat="39.4773624" data-lng="-6.3790544">
             <input id="route-to" type="text" class="form-control" placeholder="hasta..." value="Calle Carvajal Lancaster, 2" data-lat="39.4737783" data-lng="-6.376670699999977">
         </div>
         <div class="col-xs-12">
@@ -87,6 +87,7 @@
 </div>
 
 <script>
+    AccesibleMap.accesible_icon_path = "{{ url_for('static', filename='images/accesible_marker.png') }}";
     AccesibleMap.setup();
 </script>
 </body>

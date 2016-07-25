@@ -1,13 +1,6 @@
 var AccesibleMap = {};
 
-// Setup accesible marker
-AccesibleMap.accesible_icon = L.icon({
-    iconUrl: 'images/accesible_marker.png',
-    iconSize: [38, 38], // size of the icon
-    iconAnchor: [22, 22], // point of the icon which will correspond to marker's location
-    popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
-});
-
+AccesibleMap.accesible_icon_path = '';
 AccesibleMap.search_markers = [];
 AccesibleMap.search_marker_groups = [];
 
@@ -105,6 +98,15 @@ AccesibleMap.setup = function () {
     }).addTo(mapa);
 
     AccesibleMap.mapa = mapa;
+
+    //L.Routing.control({
+    //  waypoints: [
+    //    L.latLng(39.4773624,-6.3790544),
+    //    L.latLng(39.4742269,-6.377560899999935)
+    //  ],
+    //  router: L.Routing.mapzen('valhalla-dWJ_XBA', {costing:'auto'}),
+    //  formatter: new L.Routing.mapzenFormatter()
+    //}).addTo(AccesibleMap.mapa);
 
     // Set up search functionality
     AccesibleMap.setup_google_search();
@@ -335,7 +337,12 @@ AccesibleMap.add_marker = function (location, title, type) {
         "title": title,
     };
     if (type == "parking") {
-        options['icon'] = AccesibleMap.accesible_icon;
+        options['icon'] = L.icon({
+            iconUrl: AccesibleMap.accesible_icon_path,
+            iconSize: [38, 38], // size of the icon
+            iconAnchor: [22, 22], // point of the icon which will correspond to marker's location
+            popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+        });
     }
     var marker = L.marker(location, options).addTo(AccesibleMap.mapa).bindPopup(title);
     AccesibleMap.search_markers.push(marker);
@@ -370,10 +377,8 @@ AccesibleMap.calculate_route = function (waypoints, mode, costing_options) {
         lineOptions: {
             styles: styles
         },
-        router: L.Routing.valhalla('valhalla-dWJ_XBA', mode, costing_options),
-        formatter: new L.Routing.Valhalla.Formatter(),
-        summaryTemplate: '<div class="start">{name}</div><div class="info {transitmode}">{distance}, {time}</div>',
-        routeWhileDragging: false
+        router: L.Routing.mapzen('valhalla-dWJ_XBA', {costing: mode}, costing_options),
+        formatter: new L.Routing.mapzenFormatter()
     };
 
     return L.Routing.control(options);
