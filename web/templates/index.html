@@ -1,8 +1,93 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>{{ title }} - microblog</title>
-  </head>
-  <body>
-      <h1>Hello, {{ user.nickname }}!</h1>
-  </body>
+<head>
+    <title>My Routing Map</title>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.css"/>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+
+    {# the following API key is only for development #}
+    <script src="https://maps.googleapis.com/maps/api/js?v=3&libraries=places&sensor=false&key=AIzaSyB9vvH3_yypmEd4HCxvd2OtIbBk7PgbuOE"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.0.0/leaflet-routing-machine.min.js"></script>
+    <script src="{{ url_for('static', filename='assets/lrm-mapzen/lrm-mapzen.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/lrm-mapzen/leaflet.routing.mapzen.css') }}">
+
+{#    <script src="https://mapzen.com/tangram/tangram.min.js"></script>#}
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.0.0/leaflet-routing-machine.min.js"></script>#}
+{#    <script src="https://npmcdn.com/lrm-mapzen/dist/lrm-mapzen.js"></script>#}
+
+    <!-- Custom CSS & JS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/map_wrapper.js') }}"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX"crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ=="crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="map"></div>
+
+
+<div id="left-panel">
+    <div id="frame-route" class="">
+        <img id="path-icon" src="{{ url_for('static', filename='images/path_icon.png') }}">
+        <img id="current-loc-icon" src="{{ url_for('static', filename='images/current_loc.png') }}">
+
+        <div id="route-box" class="col-xs-12">
+            <input id="route-from" type="text" class="form-control" placeholder="Desde..." value="Calle Carvajal Lancaster, 14" data-lat="39.4742269" data-lng="-6.377560899999935">
+            <input id="route-to" type="text" class="form-control" placeholder="hasta..." value="Calle Carvajal Lancaster, 2" data-lat="39.4737783" data-lng="-6.376670699999977">
+        </div>
+        <div class="col-xs-12">
+            <!--<div class="checkbox">
+              <label>
+                <input id="include-parking" type="checkbox"> Buscar estacionamiento mas cercano
+              </label>
+            </div>-->
+            <div class="checkbox">
+                <label>
+                    <input id="avoid-steps" type="checkbox"> Evitar escaleras
+                </label>
+            </div>
+        </div>
+        <div class="col-xs-12 text-center">
+            <a id="calculate-route" class="btn btn-default">Ir</a>
+        </div>
+    </div>
+    <div id="frame-search" class="col-md-6 col-lg-4 hidden">
+        <div id="search-box">
+            <div class="input-group">
+                <input id="search-input" type="text" class="form-control"
+                       placeholder="Busca un lugar..." value="Calle Carvajal Lancaster, 14" data-lat="39.4742269" data-lng="-6.377560899999935">
+          <span class="input-group-btn">
+            <button id="search-btn" class="btn btn-default" type="button">Buscar</button>
+          </span>
+            </div>
+            <!-- /input-group -->
+        </div>
+        <div class="checkbox">
+            <label>
+                <input id="show-current-pos" type="checkbox">
+                <img src="{{ url_for('static', filename='images/current_loc_black.png') }}" alt="">
+                Mostrar posicion actual
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input id="show-accessible-parkings" type="checkbox">
+                <img src="{{ url_for('static', filename='images/accesible_marker.png') }}" alt="">
+                Mostrar estacionamientos accesibles
+            </label>
+        </div>
+    </div>
+    <!-- /.col-lg-6 -->
+</div>
+
+<script>
+    AccesibleMap.setup();
+</script>
+</body>
 </html>

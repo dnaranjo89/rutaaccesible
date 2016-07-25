@@ -1,0 +1,109 @@
+#map {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 20;
+}
+
+#left-panel {
+    position: absolute;
+    z-index: 500000;
+    /*visibility: hidden;*/
+}
+.pac-container{
+
+    z-index: 500020;
+}
+
+#frame-search {
+    padding-top: 15px;
+    max-width: 410px;
+    width: 420px;
+    height: 130px;
+    background: #ffffff;
+    border: solid 2px #D4D4D4;
+}
+
+@media screen and (max-width: 767px) {
+    .leaflet-control-container{
+        visibility: hidden;
+    }
+}
+
+
+#frame-route{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 420px;
+    height: 150px;
+    background: #4285F4;
+}
+
+.checkbox img{
+    height: 18px;
+    width: auto;
+}
+
+#frame-route input{
+    background: transparent;
+    color: #E6EFFE;
+    border: none;
+    width: 340px;
+}
+#frame-route .checkbox{
+    color: #E6EFFE;
+}
+#frame-route input::-webkit-input-placeholder
+{
+  color: #95BBF9;
+}
+
+#frame-route input::-moz-placeholder
+{
+  color: #95BBF9;
+}
+
+#frame-route input::-moz-placeholder
+{
+  color: #95BBF9;
+}
+
+#frame-route input:-ms-input-placeholder
+{
+  color: #95BBF9;
+}
+
+#route-box {
+    position: absolute;
+    top: 0;
+    margin-left: 40px;
+}
+
+#frame-route #path-icon {
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+#current-loc-icon {
+    position: absolute;
+    height: 20px;
+    width: auto;
+    right:5px;
+    top:10px;
+    z-index: 50;
+}
+
+#calculate-route {
+
+}
+
+
+    .search-input {
+      font-family: Courier
+    }
+
+    .search-input,
+    .leaflet-control-search {
+      max-width: 400px;
+    }
