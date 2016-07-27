@@ -1,3 +1,13 @@
+function set_location(input, lat, lng, formatted_address){
+    input.value = formatted_address;
+    input.setAttribute("data-lat", lat);
+    input.setAttribute("data-lng", lng);
+}
+
+
+
+/***********************************************************/
+
 var AccesibleMap = {};
 
 AccesibleMap.accesible_icon_path = '';
@@ -26,6 +36,7 @@ AccesibleMap.setup_google_search = function () {
 
     // Setup the From input
     var input_from = document.getElementById("route-from");
+    AccesibleMap.input_from = input_from;
     var searchbox_from = new google.maps.places.SearchBox(input_from);
     searchbox_from.addListener('places_changed', function () {
         var places = searchbox_from.getPlaces();
@@ -41,27 +52,28 @@ AccesibleMap.setup_google_search = function () {
         console.log('generate route');
     });
 
-    //// Setup the To input
-    //var input_to = document.getElementById("search-input-from");
-    //var searchbox_to = new google.maps.places.SearchBox(input_to);
-    //searchbox_to.addListener('places_changed', function () {
-    //    var places = searchbox_to.getPlaces();
-    //
-    //    if (places.length == 0) {
-    //        return;
-    //    }
-    //
-    //    var result = places[0];  // We just need the first result
-    //    var title = result.formatted_address;
-    //    var pos = [result.geometry.location.lat(),
-    //            result.geometry.location.lng()];
-    //    console.log('generate route');
-    //});
+    // Setup the To input
+    var input_to = document.getElementById("route-to");
+    AccesibleMap.input_to = input_to;
+    var searchbox_to = new google.maps.places.SearchBox(input_to);
+    searchbox_to.addListener('places_changed', function () {
+        var places = searchbox_to.getPlaces();
+
+        if (places.length == 0) {
+            return;
+        }
+
+        var result = places[0];  // We just need the first result
+        var title = result.formatted_address;
+        var pos = [result.geometry.location.lat(),
+                result.geometry.location.lng()];
+        console.log('generate route');
+    });
 
     // Setup the search input
-    var input = document.getElementById("search-input");
-    var searchBox = new google.maps.places.SearchBox(input);
-    AccesibleMap.search_input = searchBox;
+    var input_search = document.getElementById("search-input");
+    AccesibleMap.input_search = input_search;
+    var searchBox = new google.maps.places.SearchBox(input_search);
     searchBox.addListener('places_changed', function () {
         // Clean the map from previous results
         AccesibleMap.clean_map();
@@ -86,27 +98,52 @@ AccesibleMap.setup_google_search = function () {
     });
 };
 
+AccesibleMap.set_location_in_input = function(input, lat, lng){
+    var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "&sensor=false&key=AIzaSyB9vvH3_yypmEd4HCxvd2OtIbBk7PgbuOE";
+    $.get(url).done(function (response) {
+        var result = response.results[0];
+        var formatted_address = result.formatted_address;
+        var lat = result.geometry.location.lat;
+        var lng = result.geometry.location.lng;
+        set_location(input, lat, lng, formatted_address);
+    }).fail(function () {
+        console.log("Couldn't find location: " + url);
+    });
+};
+
 AccesibleMap.setup = function () {
+    // Setup context menu
+    function directions_from_here (e) {
+        //alert(e.latlng);
+        AccesibleMap.set_location_in_input(AccesibleMap.input_from, e.latlng.lat, e.latlng.lng);
+    }
+
+    function directions_to_here (e) {
+        AccesibleMap.set_location_in_input(AccesibleMap.input_to, e.latlng.lat, e.latlng.lng);
+        //alert(e.latlng);
+    }
+
+    var context_menu = {
+        contextmenu: true,
+        contextmenuWidth: 140,
+        contextmenuItems: [{
+            text: 'Directions from here',
+            callback: directions_from_here
+        }, {
+            text: 'Directions to here',
+            callback: directions_to_here
+        }]
+    };
 
     // Setup the basic map
-    var mapa = L.map('map', {zoomControl: false});
+    var mapa = L.map('map', context_menu);
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>',
         maxZoom: 20,
         id: 'dnaranjo89.97a21b99',
         accessToken: 'pk.eyJ1IjoiZG5hcmFuam84OSIsImEiOiJjaWc1Z2p4ZTc0MW0ydWttM3Mxem44cmVlIn0.qYwIDUVfbIQ2x2a9IQgg-g'
     }).addTo(mapa);
-
     AccesibleMap.mapa = mapa;
-
-    //L.Routing.control({
-    //  waypoints: [
-    //    L.latLng(39.4773624,-6.3790544),
-    //    L.latLng(39.4742269,-6.377560899999935)
-    //  ],
-    //  router: L.Routing.mapzen('valhalla-dWJ_XBA', {costing:'auto'}),
-    //  formatter: new L.Routing.mapzenFormatter()
-    //}).addTo(AccesibleMap.mapa);
 
     // Set up search functionality
     AccesibleMap.setup_google_search();
