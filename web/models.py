@@ -1,14 +1,19 @@
-# from web import db
-#
-#
-# class User(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     username = db.Column(db.String(80), unique=True)
-#     email = db.Column(db.String(120), unique=True)
-#
-#     def __init__(self, username, email):
-#         self.username = username
-#         self.email = email
-#
-#     def __repr__(self):
-#         return '<User %r>' % self.username
+from collections import namedtuple
+
+from web import db
+
+
+Location = namedtuple('Location', 'lat lng')
+
+
+class ParkingSlot(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    pos_lat = db.Column(db.Float, nullable=False)
+    pos_long = db.Column(db.Float, nullable=False)
+    extra_info = db.Column(db.Text)
+
+    def __init__(self, pos_lat, pos_long, extra_info):
+        self.pos_lat = pos_lat
+        self.pos_long = pos_long
+        self.extra_info = extra_info
+
