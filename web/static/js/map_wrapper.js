@@ -77,6 +77,7 @@ AccesibleMap.clean_map = function(){
     AccesibleMap.routes_lines.map(function (line) {
         AccesibleMap.mapa.removeControl(line);
     });
+    AccesibleMap.routes_lines = []
 };
 
 /**
