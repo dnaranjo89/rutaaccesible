@@ -314,61 +314,6 @@ AccesibleMap.draw_complete_route = function () {
 
 };
 
-
-AccesibleMap.search_nominatim = function (query) {
-    // Clean previous results
-    AccesibleMap.search_markers.map(function (marker) {
-        AccesibleMap.mapa.removeLayer(marker);
-    });
-
-    var num_results = 1;
-    //var url = "http://nominatim.openstreetmap.org/search?q=" + query + "&format=json";
-    var url = " http://nominatim.openstreetmap.org/search?q=135+pilkington+avenue,+birmingham";
-    $.get(url).done(function (response) {
-        response.features.map(function (location) {
-            var pos = [location.lat, location.lon];
-            var title = location.display_name;
-            var attr = "'" + title + "',[" + pos + "]";
-            var html_title = location.properties.label +
-                '<div class="text-center">' +
-                '<a href="#" class="btn btn-default btn-xs" onclick="AccesibleMap.add_destination_and_calc_route(' + attr + ');">Ir Aqui</a>' +
-                '</div>';
-            var marker = AccesibleMap.add_marker(pos, html_title);
-            marker.openPopup();
-            AccesibleMap.search_markers.push(marker);
-        });
-    }).fail(function () {
-        console.log("Couldn't find location: " + url);
-    });
-};
-
-AccesibleMap.search = function (query) {
-    // Clean previous results
-    AccesibleMap.search_markers.map(function (marker) {
-        AccesibleMap.mapa.removeLayer(marker);
-    });
-
-    var num_results = 1;
-    var url = "https://search.mapzen.com/v1/autocomplete?api_key=search-AU6x3Ho&text=" + query + "&boundary.country=ES&size=" + num_results;
-    $.get(url).done(function (response) {
-        response.features.map(function (location) {
-            var cords = location.geometry.coordinates;
-            var pos = [cords[1], cords[0]];
-            var title = location.properties.label;
-            var attr = "'" + title + "',[" + pos + "]";
-            var html_title = location.properties.label +
-                '<div class="text-center">' +
-                '<a href="#" class="btn btn-default btn-xs" onclick="AccesibleMap.add_destination_and_calc_route(' + attr + ');">Ir Aqui</a>' +
-                '</div>';
-            var marker = AccesibleMap.add_marker(pos, html_title);
-            marker.openPopup();
-            AccesibleMap.search_markers.push(marker);
-        });
-    }).fail(function () {
-        console.log("Couldn't find location: " + url);
-    });
-};
-
 AccesibleMap.add_origen_current_loc = function () {
     AccesibleMap.show_current_location(true);
     navigator.geolocation.getCurrentPosition(function (current_pos) {
