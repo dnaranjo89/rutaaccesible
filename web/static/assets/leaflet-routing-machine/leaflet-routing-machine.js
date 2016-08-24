@@ -2359,13 +2359,7 @@ if (typeof module !== undefined) module.exports = polyline;
 
 			for (i = 0; i < this._waypoints.length; i++) {
 				if (this._waypoints[i].latLng) {
-					if (this.options.parking_route) {
-						if (!((this.options.parking_route == "auto" && i >= this._waypoints.length - 1) || (this.options.parking_route == "pedestrian" && i == 0))){
-							m = this.options.createMarker(i, this._waypoints[i], this._waypoints.length);
-						}else{
-							m = null;
-						}
-					}else{
+					if (!this.options.parking_route){
 						m = this.options.createMarker(i, this._waypoints[i], this._waypoints.length);
 					}
 					if (m) {
