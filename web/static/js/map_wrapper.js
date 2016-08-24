@@ -1,3 +1,7 @@
+/**
+ * Set the location in the given input.
+ * That means set the input text, latitude and longitude
+ */
 function set_location(input, lat, lng, formatted_address){
     input.value = formatted_address;
     input.setAttribute("data-lat", lat);
@@ -11,6 +15,8 @@ function set_location(input, lat, lng, formatted_address){
 var AccesibleMap = {};
 
 AccesibleMap.accesible_icon_path = '';
+AccesibleMap.marker_origin = null;
+AccesibleMap.marker_destination = null;
 AccesibleMap.search_markers = [];
 AccesibleMap.search_marker_groups = [];
 
@@ -98,14 +104,28 @@ AccesibleMap.setup_google_search = function () {
     });
 };
 
-AccesibleMap.set_location_in_input = function(input, lat, lng){
+AccesibleMap.set_location_in_input = function(input, lat, lng, callback){
     var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "&sensor=false&key=AIzaSyB9vvH3_yypmEd4HCxvd2OtIbBk7PgbuOE";
     $.get(url).done(function (response) {
+
+        // Fill the origin input with the location details
         var result = response.results[0];
         var formatted_address = result.formatted_address;
         var lat = result.geometry.location.lat;
         var lng = result.geometry.location.lng;
         set_location(input, lat, lng, formatted_address);
+
+        // Add the marker
+        callback(lat, lng, formatted_address);
+
+        // Change the view to 'directions'
+        AccesibleMap.change_search_mode('directions');
+
+        if (AccesibleMap.marker_origin != null && AccesibleMap.marker_destination != null){
+            // Calculate route
+            AccesibleMap.draw_complete_route();
+        }
+
     }).fail(function () {
         console.log("Couldn't find location: " + url);
     });
@@ -114,13 +134,37 @@ AccesibleMap.set_location_in_input = function(input, lat, lng){
 AccesibleMap.setup = function () {
     // Setup context menu
     function directions_from_here (e) {
-        //alert(e.latlng);
-        AccesibleMap.set_location_in_input(AccesibleMap.input_from, e.latlng.lat, e.latlng.lng);
+        var callback_origin = function (lat, lng, tooltip_text) {
+            // If exists, remove previous origin marker
+            if (AccesibleMap.marker_origin != null) {
+                AccesibleMap.mapa.removeLayer(AccesibleMap.marker_origin);
+                AccesibleMap.marker_origin = null;
+            }
+
+            // Add a marker
+            var pos = [lat, lng];
+            var marker = AccesibleMap.add_marker(pos, tooltip_text);
+            marker.openPopup();
+            AccesibleMap.marker_origin = marker;
+        };
+        AccesibleMap.set_location_in_input(AccesibleMap.input_from, e.latlng.lat, e.latlng.lng, callback_origin);
     }
 
-    function directions_to_here (e) {
-        AccesibleMap.set_location_in_input(AccesibleMap.input_to, e.latlng.lat, e.latlng.lng);
-        //alert(e.latlng);
+    function directions_to_here(e) {
+        var callback_destination = function (lat, lng, tooltip_text) {
+            // If exists, remove previous origin marker
+            if (AccesibleMap.marker_destination != null) {
+                AccesibleMap.mapa.removeLayer(AccesibleMap.marker_destination);
+                AccesibleMap.marker_destination = null;
+            }
+
+            // Add a marker
+            var pos = [lat, lng];
+            var marker = AccesibleMap.add_marker(pos, tooltip_text);
+            marker.openPopup();
+            AccesibleMap.marker_destination = marker;
+        };
+        AccesibleMap.set_location_in_input(AccesibleMap.input_to, e.latlng.lat, e.latlng.lng, callback_destination);
     }
 
     var context_menu = {
@@ -289,13 +333,26 @@ AccesibleMap.add_origen_current_loc = function () {
         $origen.attr("data-lat", current_pos[0]);
         $origen.attr("data-lng", current_pos[1]);
     });
-    $('#route-from').val("Posición actual");
+    $('#route-from').val("Posiciï¿½n actual");
+};
+
+/**
+ * Show the panel given as parameter.
+ * It may be 'search' or 'directions'
+ */
+AccesibleMap.change_search_mode = function (mode){
+    if (mode=='search'){
+        $('#frame-search').toggleClass('hidden', false);
+        $('#frame-route').toggleClass('hidden', true);
+    } else {
+        $('#frame-search').toggleClass('hidden', true);
+        $('#frame-route').toggleClass('hidden', false);
+    }
 };
 
 AccesibleMap.add_destination_and_calc_route = function (title, destination) {
     // Switch to route frame
-    $('#frame-search').toggleClass('hidden', true);
-    $('#frame-route').toggleClass('hidden', false);
+    AccesibleMap.change_search_mode('directions');
 
     // Update destination field
     var $destination = $('#route-to');
@@ -316,7 +373,7 @@ AccesibleMap.show_current_location = function (enable_location) {
         function onLocationFound(e) {
             var radius = e.accuracy / 2;
             AccesibleMap.current_location_markers.push({
-                marker: L.marker(e.latlng).addTo(AccesibleMap.mapa).bindPopup("<div class='text-center'>Estás aquí<br> (precisión " + radius + " metros)</div>").openPopup(),
+                marker: L.marker(e.latlng).addTo(AccesibleMap.mapa).bindPopup("<div class='text-center'>Estï¿½s aquï¿½<br> (precisiï¿½n " + radius + " metros)</div>").openPopup(),
                 circle: L.circle(e.latlng, radius).addTo(AccesibleMap.mapa)
             });
             var $origen = $('#route-from');

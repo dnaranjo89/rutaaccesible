@@ -35,7 +35,7 @@
 
 
 <div id="left-panel">
-    <div id="frame-route" class="">
+    <div id="frame-route" class="hidden">
         <img id="path-icon" src="{{ url_for('static', filename='images/path_icon.png') }}">
         <img id="current-loc-icon" src="{{ url_for('static', filename='images/current_loc.png') }}">
 
@@ -63,7 +63,7 @@
             <a id="calculate-route" class="btn btn-default">Ir</a>
         </div>
     </div>
-    <div id="frame-search" class="col-md-6 col-lg-4 hidden">
+    <div id="frame-search" class="col-md-6 col-lg-4">
         <div id="search-box">
             <div class="input-group">
                 <input id="search-input" type="text" class="form-control" placeholder="Busca un lugar..." value="Calle Carvajal Lancaster, 14" data-lat="39.4742269" data-lng="-6.377560899999935">
