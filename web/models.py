@@ -17,3 +17,13 @@ class ParkingSlot(db.Model):
         self.pos_long = pos_long
         self.extra_info = extra_info
 
+    @property
+    def serialize(self):
+       """Return object data in easily serializeable format"""
+       return {
+           'id': self.id,
+           'pos_lat': self.pos_lat,
+           'pos_long': self.pos_long,
+           'extra_info': self.extra_info,
+       }
+

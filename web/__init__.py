@@ -6,3 +6,4 @@ webapp.config.from_object('config')
 db = SQLAlchemy(webapp)
 
 from web import views, models
+from web.rest_api import services
