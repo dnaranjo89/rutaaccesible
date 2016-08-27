@@ -26,7 +26,7 @@ class ClosestParkingSlotAPI(Resource):
         lng = parser.add_argument('lng', type=float)
         eee = parser.parse_args()
 
-        return ParkingSlot.query.filter_by(id=id).first().serialize
+        return ParkingSlot.get_closest(lat, lng)
 
 
 # api.add_resource(ParkingSlotListAPI, '/api/v1.0/parking_slot')
