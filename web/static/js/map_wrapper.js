@@ -294,13 +294,8 @@ AccesibleMap.draw_complete_route = function () {
     var destination = [$destination.attr('data-lat'), $destination.attr('data-lng')];
     var step_penalty = $('#avoid-steps').is(":checked");
 
-    var callback_get_parking = function (data) {
-        var plazas = [];
-        for (var i = 0; i < data.results.bindings.length; i++) {
-            plazas.push([data.results.bindings[i].geo_lat_plaza.value, data.results.bindings[i].geo_long_plaza.value]);
-        }
-        console.log(plazas);
-        var best_parking = plazas[0];
+    var callback_get_parking = function (parking_slot) {
+        var best_parking = [parking_slot.lat, parking_slot.lng];
         console.log("origen:" + origen);
         console.log("destino:" + destination);
         AccesibleMap.marker_route_parking = AccesibleMap.add_marker(best_parking, "Parking", "parking");
@@ -309,8 +304,6 @@ AccesibleMap.draw_complete_route = function () {
     };
 
     var parkings = AccesibleMap.get_closest_parking(destination, callback_get_parking);
-    console.log(destination);
-    console.log(parkings);
 
 };
 
@@ -395,7 +388,7 @@ AccesibleMap.show_accessible_parkings = function (show_parkings) {
     if (show_parkings) {
         var callback_show_parkings = function (data) {
             var plazas = [];
-            for (i = 0; i < data.results.bindings.length; i++) {
+            for (var i = 0; i < data.results.bindings.length; i++) {
                 plazas.push([data.results.bindings[i].geo_lat.value, data.results.bindings[i].geo_long.value]);
                 var location = [data.results.bindings[i].geo_lat.value, data.results.bindings[i].geo_long.value];
                 AccesibleMap.markers_parking.push(AccesibleMap.add_marker(location, "parking", "parking"));
@@ -472,25 +465,38 @@ AccesibleMap.calculate_route = function (waypoints, mode, costing_options) {
  */
 
 AccesibleMap.get_closest_parking = function (location, callback_get_parking) {
-    var pk = "select ?uri ?geo_lat_plaza ?geo_long_plaza ?distancia {" +
-        "{select ?uri ?geo_lat_plaza ?geo_long_plaza ((bif:st_distance(bif:st_point(" +
-        "\"" + location[0] + "\"^^xsd:decimal," +
-        "\"" + location[1] + "\"^^xsd:decimal),bif:st_point(?geo_lat_plaza,?geo_long_plaza))) AS ?distancia) where{" +
-        "?uri a om:PlazaMovilidadReducida ." +
-        "?uri geo:lat ?geo_lat_plaza ." +
-        "?uri geo:long ?geo_long_plaza ." +
-        "}order by asc (?distancia) } FILTER (?distancia < 1) }limit 3";
-
-    var plazas = [];
-
-    var graphQuerySPARQL = "";
-    var preQuerySPARQL = "http://opendata.caceres.es/sparql";
+    var data = {
+        'lat': location[0],
+        'lng': location[1]
+    };
+    var url_params = $.param(data);
+    var url = '/api/v1.0/parking_slot?' + url_params;
+    console.log(url);
 
     $.ajax({
-        data: {"default-graph-uri": graphQuerySPARQL, query: pk, format: 'json'},
-        url: preQuerySPARQL,
-        cache: false
+        method: 'GET',
+        url: url
     }).done(callback_get_parking);
+
+    // var pk = "select ?uri ?geo_lat_plaza ?geo_long_plaza ?distancia {" +
+    //     "{select ?uri ?geo_lat_plaza ?geo_long_plaza ((bif:st_distance(bif:st_point(" +
+    //     "\"" + location[0] + "\"^^xsd:decimal," +
+    //     "\"" + location[1] + "\"^^xsd:decimal),bif:st_point(?geo_lat_plaza,?geo_long_plaza))) AS ?distancia) where{" +
+    //     "?uri a om:PlazaMovilidadReducida ." +
+    //     "?uri geo:lat ?geo_lat_plaza ." +
+    //     "?uri geo:long ?geo_long_plaza ." +
+    //     "}order by asc (?distancia) } FILTER (?distancia < 1) }limit 3";
+    //
+    // var plazas = [];
+    //
+    // var graphQuerySPARQL = "";
+    // var preQuerySPARQL = "http://opendata.caceres.es/sparql";
+    //
+    // $.ajax({
+    //     data: {"default-graph-uri": graphQuerySPARQL, query: pk, format: 'json'},
+    //     url: preQuerySPARQL,
+    //     cache: false
+    // }).done(callback_get_parking);
 };
 
 

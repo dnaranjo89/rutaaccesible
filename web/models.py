@@ -22,56 +22,10 @@ class ParkingSlot(db.Model):
 
     @property
     def serialize(self):
-       """Return object data in easily serializeable format"""
-       return {
-           'id': self.id,
-           'pos_lat': self.pos_lat,
-           'pos_long': self.pos_long,
-           'extra_info': self.extra_info,
-       }
-
-    @staticmethod
-    def get_closest(lat, lng):
-        sql = text('SELECT id, pos_lat, pos_long, extra_info,'
-                   '      111.045* DEGREES(ACOS(COS(RADIANS(latpoint))'
-                   '                 * COS(RADIANS(pos_lat))'
-                   '                 * COS(RADIANS(longpoint) - RADIANS(pos_long))'
-                   '                 + SIN(RADIANS(latpoint))'
-                   '                 * SIN(RADIANS(pos_lat)))) AS distance_in_km'
-                   ' FROM parking_slot'
-                   ' JOIN ('
-                   '     SELECT  39.472  AS latpoint,  -6.40567 AS longpoint'
-                   '   ) AS p ON 1=1'
-                   ' ORDER BY distance_in_km'
-                   ' LIMIT 15;')
-        result = db.session.execute(sql).first()
-        response = {
-            'lat': result[1],
-            'lng': result[2],
-            'info': result[3],
-            'distance': result[4]
+        """Return object data in easily serializeable format"""
+        return {
+            'id': self.id,
+            'pos_lat': self.pos_lat,
+            'pos_long': self.pos_long,
+            'extra_info': self.extra_info,
         }
-        return jsonify(response)
-
-
-
-
-
-'''
-http://www.plumislandmedia.net/mysql/haversine-mysql-nearest-loc/
-
-SELECT id, pos_lat, pos_long,
-      111.045* DEGREES(ACOS(COS(RADIANS(latpoint))
-                 * COS(RADIANS(pos_lat))
-                 * COS(RADIANS(longpoint) - RADIANS(pos_long))
-                 + SIN(RADIANS(latpoint))
-                 * SIN(RADIANS(pos_lat)))) AS distance_in_km
- FROM parking_slot
- JOIN (
-     SELECT  39.472  AS latpoint,  -6.40567 AS longpoint
-   ) AS p ON 1=1
- ORDER BY distance_in_km
- LIMIT 15;
-'''
-
-
