@@ -18,7 +18,8 @@
 
     <!-- Routing -->
     <script src="{{ url_for('static', filename='assets/leaflet-routing-machine/leaflet-routing-machine.js') }}"></script>
-    <script src="{{ url_for('static', filename='assets/lrm-mapzen/lrm-mapzen.js') }}"></script>
+{#    <script src="{{ url_for('static', filename='assets/lrm-mapzen/lrm-mapzen.js') }}"></script>#}
+    <script src="{{ url_for('static', filename='assets/lrm-valhalla/lrm-valhalla.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/lrm-mapzen/leaflet.routing.mapzen.css') }}">
 
     <!-- Custom CSS & JS -->
@@ -90,17 +91,6 @@
 <script>
     AccesibleMap.accesible_icon_path = "{{ url_for('static', filename='images/accesible_marker.png') }}";
     AccesibleMap.setup();
-    var parking_slots =  [
-        {% for parking_slot in parking_slots %}
-            {
-            location: {
-                lat: {{ parking_slot.pos_lat }},
-                lng: {{ parking_slot.pos_long }}
-                },
-            extra_info: '{{ parking_slot.extra_info }}'
-            },
-        {% endfor %}
-    ];
 </script>
 </body>
 </html>

@@ -296,8 +296,6 @@ AccesibleMap.draw_complete_route = function () {
 
     var callback_get_parking = function (parking_slot) {
         var best_parking = [parking_slot.lat, parking_slot.lng];
-        console.log("origen:" + origen);
-        console.log("destino:" + destination);
         AccesibleMap.marker_route_parking = AccesibleMap.add_marker(best_parking, "Parking", "parking");
         AccesibleMap.routes_lines.push(AccesibleMap.calculate_route_pedestrian(best_parking, destination, step_penalty).addTo(AccesibleMap.mapa));
         AccesibleMap.routes_lines.push(AccesibleMap.calculate_route_auto(origen, best_parking).addTo(AccesibleMap.mapa));
@@ -406,10 +404,9 @@ AccesibleMap.show_accessible_parkings = function (show_parkings) {
 /**
  * Internal functions
  */
-
 AccesibleMap.add_marker = function (location, title, type) {
     var options = {
-        "title": title,
+        "title": title
     };
     if (type == "parking") {
         options['icon'] = L.icon({
@@ -433,7 +430,7 @@ AccesibleMap.calculate_route_auto = function (origen, destination) {
 
 AccesibleMap.calculate_route_pedestrian = function (origen, destination, avoid_stairs) {
     var waypoints = [origen, destination];
-    var step_penalty = avoid_stairs ? 99999 : 0;
+    var step_penalty = avoid_stairs ? 999999 : 0;
     var costing_options = {"pedestrian": {"step_penalty": step_penalty}};
     var mode = "pedestrian";
     return AccesibleMap.calculate_route(waypoints, mode, costing_options);
@@ -452,8 +449,9 @@ AccesibleMap.calculate_route = function (waypoints, mode, costing_options) {
         lineOptions: {
             styles: styles
         },
-        router: L.Routing.mapzen('valhalla-dWJ_XBA', {costing: mode}, costing_options),
-        formatter: new L.Routing.mapzenFormatter()
+        router: L.Routing.valhalla('valhalla-dWJ_XBA', mode, costing_options),
+        formatter: new L.Routing.Valhalla.Formatter(),
+        routeWhileDragging: false
     };
 
     return L.Routing.control(options);
@@ -461,9 +459,8 @@ AccesibleMap.calculate_route = function (waypoints, mode, costing_options) {
 
 
 /**
- *  Opendata Queries
+ *  Get the closest parking slot from a given location from the API
  */
-
 AccesibleMap.get_closest_parking = function (location, callback_get_parking) {
     var data = {
         'lat': location[0],
@@ -471,32 +468,11 @@ AccesibleMap.get_closest_parking = function (location, callback_get_parking) {
     };
     var url_params = $.param(data);
     var url = '/api/v1.0/parking_slot?' + url_params;
-    console.log(url);
 
     $.ajax({
         method: 'GET',
         url: url
     }).done(callback_get_parking);
-
-    // var pk = "select ?uri ?geo_lat_plaza ?geo_long_plaza ?distancia {" +
-    //     "{select ?uri ?geo_lat_plaza ?geo_long_plaza ((bif:st_distance(bif:st_point(" +
-    //     "\"" + location[0] + "\"^^xsd:decimal," +
-    //     "\"" + location[1] + "\"^^xsd:decimal),bif:st_point(?geo_lat_plaza,?geo_long_plaza))) AS ?distancia) where{" +
-    //     "?uri a om:PlazaMovilidadReducida ." +
-    //     "?uri geo:lat ?geo_lat_plaza ." +
-    //     "?uri geo:long ?geo_long_plaza ." +
-    //     "}order by asc (?distancia) } FILTER (?distancia < 1) }limit 3";
-    //
-    // var plazas = [];
-    //
-    // var graphQuerySPARQL = "";
-    // var preQuerySPARQL = "http://opendata.caceres.es/sparql";
-    //
-    // $.ajax({
-    //     data: {"default-graph-uri": graphQuerySPARQL, query: pk, format: 'json'},
-    //     url: preQuerySPARQL,
-    //     cache: false
-    // }).done(callback_get_parking);
 };
 
 
