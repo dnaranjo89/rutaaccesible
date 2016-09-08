@@ -1,2 +1,5 @@
 from web import webapp
-webapp.run(debug=True)
+
+if __name__ == '__main__':
+    webapp.run(host='0.0.0.0',
+               debug=False)
