@@ -28,10 +28,10 @@ class ClosestParkingSlotAPI(Resource):
         args = parser.parse_args()
         num_results = 5
 
-        sql = text('SELECT id, pos_lat, pos_long, extra_info,'
+        sql = text('SELECT id, pos_lat, pos_lon, extra_info,'
                    '      111.045* DEGREES(ACOS(COS(RADIANS(latpoint))'
                    '                 * COS(RADIANS(pos_lat))'
-                   '                 * COS(RADIANS(longpoint) - RADIANS(pos_long))'
+                   '                 * COS(RADIANS(longpoint) - RADIANS(pos_lon))'
                    '                 + SIN(RADIANS(latpoint))'
                    '                 * SIN(RADIANS(pos_lat)))) AS distance_in_km'
                    ' FROM parking_slot'
