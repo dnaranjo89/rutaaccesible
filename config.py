@@ -1,4 +1,9 @@
-import os
-basedir = os.path.abspath(os.path.dirname(__file__))
+from sqlalchemy.engine.url import URL
 
-SQLALCHEMY_DATABASE_URI = 'mysql://root:MYSQL_PASSWORD_PLACEHOLDER@localhost/rutaaccesible'
+
+DB_NAME = "rutaaccesible"
+
+SQLALCHEMY_DATABASE_URI = URL(drivername='mysql', host='localhost',
+                              database=DB_NAME,
+                              query={'read_default_file': '~/.my.cnf'}
+                              )
